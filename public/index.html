@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<title>Ubetaxi</title>
+<!-- update the version number as needed -->
+<script defer src="/__/firebase/10.12.3/firebase-app-compat.js"></script>
+<!-- include only the Firebase features as you need -->
+<script defer src="/__/firebase/10.12.3/firebase-auth-compat.js"></script>
+<script defer src="/__/firebase/10.12.3/firebase-database-compat.js"></script>
+<script defer src="/__/firebase/10.12.3/firebase-firestore-compat.js"></script>
+<script defer src="/__/firebase/10.12.3/firebase-functions-compat.js"></script>
+<script defer src="/__/firebase/10.12.3/firebase-messaging-compat.js"></script>
+<script defer src="/__/firebase/10.12.3/firebase-storage-compat.js"></script>
+<script defer src="/__/firebase/10.12.3/firebase-analytics-compat.js"></script>
+<script defer src="/__/firebase/10.12.3/firebase-remote-config-compat.js"></script>
+<script defer src="/__/firebase/10.12.3/firebase-performance-compat.js"></script>
+<!-- 
+  initialize the SDK after all desired features are loaded, set useEmulator to false
+  to avoid connecting the SDK to running emulators.
+-->
+<script defer src="/__/firebase/init.js?useEmulator=true"></script>
+
+</head>
+<body>
+    <header>
+        <div style="text-align: center;">
+            <figure>
+                <img src="./images/logo.png" alt="" width="856" height="300">
+            </figure>
+        </div>
+        <style>
+            header figure {
+                position: static;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                margin: 0;
+            }
+        </style>
+    </header>
+    <div>
+        <input type="text" id="searchInput" placeholder="キーワードで検索">
+        <button id="searchButton">検索</button>
+    </div>    
+    <div id="output" style="overflow: auto;height: 800px;"></div> 
+    <section class="tours">
+        <!-- ボタン -->
+        <a href="#popup" class="btn-flat">
+            <span>
+                <img width="100" src="./images/taxi.png" alt="taxi">
+            </span>
+        </a> 
+    </section>
+    <!-- ポップアップ -->
+    <section class="popup" id="popup">
+        <div class="popup__container">
+            <h2>投稿フォーム</h2>
+            <div class="cp_iptxt">
+                <label for="uname">氏名</label>
+                <input class="ef" type="text" id="uname">
+                <span class="focus_line"></span>
+            </div>
+            <div class="cp_iptxt">
+                <label for="text">目的地等</label>
+                <textarea class="destination" id="text" placeholder="集合地・目的地(経由地)・ナンバープレートの数字"></textarea>
+            </div>
+            <div class="cp_iptxt">
+                <label for="date">集合時間</label>
+                <input class="date_time" type="datetime-local" id="date">
+            </div>
+            <div class="cp_iptxt">
+                <label for="capacity">空き定員</label>
+                <input class="people" type="number" id="capacity" value="3">
+            </div>
+            <a href="#" class="register" id="send">投稿</a>
+        </div>
+        <a href="#tours" class="popup__close">&times;</a>
+    </section>
+    
+  
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-geWF76RCwLtnZ8qwWowPQNguL3RmwHVBC9FhGdlKrxdiJJigb/j/68SIy3Te4Bkz" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="design.css">
+    <link href="https://use.fontawesome.com/releases/v5.6.1/css/all.css" rel="stylesheet">
+</body>
+
+
+
+
+
+<!-- JQuery -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<!-- JQuery -->
+
+
+<!--** 以下Firebase **-->
+<script type="module">
+    // Import the functions you need from the SDKs you need
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.0.2/firebase-app.js";
+    import { getFirestore, collection, doc, Timestamp, addDoc, deleteDoc, onSnapshot, query, orderBy,getDoc,updateDoc } 
+    from "https://www.gstatic.com/firebasejs/9.0.2/firebase-firestore.js";      
+  
+    // Your web app's Firebase configuration
+    const firebaseConfig = {
+    apiKey: "AIzaSyBvrQWIEovzTeXS-fV66-KHJvPlUeb6SR8",
+    authDomain: "ubetaxi-6761c.firebaseapp.com",
+    projectId: "ubetaxi-6761c",
+    storageBucket: "ubetaxi-6761c.appspot.com",
+    messagingSenderId: "30789926245",
+    appId: "1:30789926245:web:501bc1019e495bc93ef58c",
+    measurementId: "G-7590E0MW5H"
+  };
+    // Initialize Firebase
+const app = initializeApp(firebaseConfig);
+
+// Firestoreを使う
+const db = getFirestore(app);
+const ref = collection(db, "chat");
+
+//popupを非表示状態にする
+document.querySelector('.btn-flat').addEventListener('click', function() {
+    document.getElementById('popup').classList.add('show');
+});
+
+document.querySelector('.popup__close').addEventListener('click', function() {
+    document.getElementById('popup').classList.remove('show');
+});
+
+//現在時刻をdatetime-localのvalueに設定
+document.addEventListener('DOMContentLoaded', (event) => {
+        let now = new Date();
+        let year = now.getFullYear();
+        let month = String(now.getMonth() + 1).padStart(2, '0');
+        let day = String(now.getDate()).padStart(2, '0');
+        let hours = String(now.getHours()).padStart(2, '0');
+        let minutes = String(now.getMinutes()).padStart(2, '0');
+
+        let currentDateTime = `${year}-${month}-${day}T${hours}:${minutes}`;
+        document.getElementById('date').value = currentDateTime;
+    });
+
+// 送信ボタン機能(データ追加)
+$("#send").on("click", function() {
+    const ob = {
+        uname: $("#uname").val(),
+        text: $("#text").val(),
+        capacity: parseInt($("#capacity").val(), 10),
+        date: $("#date").val(),
+        reservation_list: []
+    };
+    addDoc(ref, ob) // 自動採番で登録
+        .then(() => {
+            alert("投稿しました");
+        })
+        .catch(error => {
+            console.error("ドキュメントを追加してください", error);
+        });
+});
+
+// 予約ボタン機能
+$(document).on('click', '.appoint-btn', async function() {
+    let $parent = $(this).closest('p');
+    let userName = $parent.find('.user-name').val();
+    
+    if (!userName) {
+        alert("名前を入力してください");
+        return;
+    }
+
+    //  document ID
+    let docId = $parent.attr('data-id');
+
+    // Firestoreからデータ取得
+    let docRef = doc(db, "chat", docId);
+    let docSnap = await getDoc(docRef);
+    if (docSnap.exists()) {
+        let data = docSnap.data();
+        let currentCapacity = data.capacity;
+
+        if (currentCapacity > 0) {
+            let newCapacity = currentCapacity - 1;
+            let newReservationList = data.reservation_list || [];
+            newReservationList.push(userName);
+
+            // Firestoreのデータ更新
+            await updateDoc(docRef, {
+                capacity: newCapacity,
+                reservation_list: newReservationList
+            });
+
+            // 表示を更新
+            $parent.find('.capacity').text(newCapacity);
+            $parent.find('.reservation_list').append('<br>予約者: ' + userName);
+            $parent.find('.user-name').val('');
+        } else {
+            alert("満員です");
+        }
+    } else {
+        console.error("エラー");
+    }
+});
+
+// 検索ボタンのクリックイベント
+document.getElementById('searchButton').addEventListener('click', function() {
+    const keyword = document.getElementById('searchInput').value.toLowerCase();
+    searchPosts(keyword);
+});
+
+// 投稿を検索する関数
+async function searchPosts(keyword) {
+    // クエリを使用して全ての投稿を取得
+    const q = query(ref, orderBy("date", "desc"));
+    const querySnapshot = await getDocs(q);
+
+    $("#output").empty();
+    querySnapshot.forEach((doc) => {
+        const data = doc.data();
+        const uname = (data.uname || '').toLowerCase();
+        const text = (data.text || '').toLowerCase();
+        
+        // キーワードが氏名または目的地に含まれているかチェック
+        if (uname.includes(keyword) || text.includes(keyword)) {
+            const h = `<p class="post" data-id="${doc.id}">
+                投稿者 : ${data.uname || ''}<br>
+                目的地 : ${data.text || ''}<br>
+                空き定員 : <span class="capacity">${data.capacity || ''}</span><br>
+                集合日時 : ${data.date || ''}<br>
+                名前 : <input type="text" class="user-name" placeholder="名前を入力してください">
+                <button class="appoint-btn">予約</button>
+                <div class="reservation_list">${(data.reservation_list || []).map(name => '予約者: ' + name).join('<br>')}</div>
+            </p>`;
+            $("#output").prepend(h);
+        }
+    });
+}
+
+// 掲示板onSnapshotでリアルタイムにデータを取得
+const q = query(ref, orderBy("date", "desc"));
+onSnapshot(q, function(snapshot) {
+    $("#output").empty();
+    snapshot.docChanges().forEach((change) => {
+        if (change.type === "added" || change.type === "modified") {
+            let data = change.doc.data();
+            let currentDate = new Date();
+            let docDate = new Date(data.date);
+
+            // 現在時刻より未来の募集のみを表示
+            if (docDate > currentDate) {
+                const h = `<p class="post" data-id="${change.doc.id}">
+                    投稿者 : ${data.uname || ''}<br>
+                    目的地 : ${data.text || ''}<br>
+                    空き定員 : <span class="capacity">${data.capacity || ''}</span><br>
+                    集合日時 : ${data.date || ''}<br>
+                    名前 : <input type="text" class="user-name" placeholder="名前を入力してください">
+                    <button class="appoint-btn">予約</button>
+                    <div class="reservation_list">${(data.reservation_list || []).map(name => '予約者: ' + name).join('<br>')}</div>
+                </p>`;
+                $("#output").prepend(h);
+            }
+        }
+    });
+});
+
+
+
+  </script>
+</body>
+</html>

@@ -1,0 +1,175 @@
+.btn-flat {
+  position: fixed;
+  bottom: 10%;
+  right: 15%;
+  width: 70px;
+  height: 70px;
+  line-height: 70px;
+  color: white;
+  font-weight: bold;
+  font-size: 30px;
+  border-radius: 50%;
+  text-align: center;
+}
+
+.popup {
+  width: 100vw;
+  height: 100vh;
+  background: rgba(253, 253, 253, 0.8);
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 1000;
+  transition: all .2s;
+  visibility: hidden;
+  display: none;
+}
+
+.popup.show{
+  display: block;
+}
+
+.popup__container {
+  width: 50%;
+  height: auto; /* 自動で高さを調整 */
+  background: #C3D9CE;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  padding: 5rem;
+}
+
+.popup__container h2 {
+  margin-bottom: 2rem;
+  text-align: center;
+}
+
+.popup:target {
+  visibility: visible;
+}
+
+.popup__close {
+  position: absolute;
+  top: 2rem;
+  right: 2rem;
+  color: black;
+  text-decoration: none;
+  font-size: 5rem;
+  line-height: 1rem;
+}
+
+.cp_iptxt {
+  display: flex;
+  align-items: center;
+  margin-bottom: 1rem; /* フィールド間の間隔を調整 */
+}
+
+.cp_iptxt label {
+  width: 100px;
+  margin-right: 10px; /* ラベルと入力フィールドの間のスペース */
+}
+
+.cp_iptxt input[type='text'],
+.cp_iptxt textarea,
+.cp_iptxt input[type='datetime-local'],
+.cp_iptxt input[type='number'] {
+  flex: 1; /* 入力フィールドを残りのスペースに合わせる */
+  padding: 0.5rem;
+}
+
+.ef, .destination, .date_time, .people {
+  margin: 0;
+}
+
+/* 氏名フィールドのスタイルを以前のものに戻す */
+.cp_iptxt input[type='text'] {
+  font: 15px/24px sans-serif;
+  box-sizing: border-box;
+  width: 100%;
+  letter-spacing: 1px;
+  padding-left: 0;
+  border: 0;
+  border-bottom: 1px solid #1b2538;
+  background-color: transparent;
+  outline: none;
+}
+
+.cp_iptxt input[type='text']:focus {
+  border-bottom: 2px solid #da3c41;
+}
+
+.cp_iptxt input[type='text'] ~ label {
+  position: absolute;
+  top: -20px;
+  left: 0;
+  font-size: 12px;
+  color: #da3c41;
+  transition: 0.2s;
+}
+
+.cp_iptxt input[type='text']:focus ~ label,
+.cp_iptxt input[type='text']:valid ~ label {
+  top: -20px;
+  font-size: 12px;
+  color: #da3c41;
+}
+
+.register {
+  display: block;
+  text-align: center;
+  text-decoration: none;
+  width: 200px;
+  margin: 2rem auto; /* ボタンの上下マージン */
+  padding: 1rem 4rem;
+  font-weight: bold;
+  border: 2px solid #da3c41;
+  color: #da3c41;
+  border-radius: 100vh;
+  transition: 0.01s;
+}
+
+.register:hover {
+  color: #fff;
+  background: #da3c41;
+}
+
+h2 {
+  text-align: center;
+  padding-left: 1.2em; /* アイコン分のスペース */
+  line-height: 1.4; /* 行高 */
+  font-style: inherit;
+}
+
+.board {
+  text-align: center;
+}
+
+#output {
+  padding-left: 25%;
+  padding-right: 25%;
+  padding-top: 5%;
+  padding-bottom: 5%;
+  width: auto;
+  height: auto;
+  position: relative;
+  font-size: large;
+}
+
+.post {
+  border: 2px solid green;
+  padding: 7px;
+  margin-bottom: 10px;
+}
+
+.reservation_list {
+  width: auto;
+  height: auto;
+  position: relative;
+  top: -24%;
+  left: 50%;
+  color: #86AB6D;
+  font-size: large;
+  padding-bottom: 3%;
+}
+
